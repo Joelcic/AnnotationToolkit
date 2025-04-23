@@ -106,4 +106,4 @@ Got an idea or need a feature? [Open an issue](https://github.com/joelcic/Annota
 ---
 ## 👤 Author
 
-Made with ❤️ by **Joel Carlsson** 
+Made with ❤️ by **Joel** 
