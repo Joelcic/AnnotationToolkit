@@ -87,14 +87,15 @@ Extract and save specific frames from video files.
 ## 🧩 Upcoming Features
 
 We're actively improving AnnotationToolKit to make it more powerful and flexible for all types of computer vision workflows. Here's what's on the roadmap:
-
-- 🗂️ **Support for more export formats**
+ 
+- 🧠 **Image classification mode**  
 
 - ✏️ **Polygon & segmentation tools**
 
-- 🤖 **Automatic annotation (AI-assisted labeling)**
+- 🤖 **Automatic annotation/classification (AI-assisted labeling)**
+- 🗂️ **Support for more export formats**
 
-- 🎨 **Custom class colors & style preferences**
+- 🎨 **Custom style preferences**
 
 - 🧱 **Resizable & draggable bounding boxes**
 
