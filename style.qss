@@ -62,4 +62,8 @@ QLabel#ImageLabel {
     border: 1px solid gray;
     background: white;
 }
+QLabel#VideoLabel {
+    border: 1px solid gray;
+    background: white;
+}
 
