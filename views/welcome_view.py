@@ -8,12 +8,12 @@ class WelcomePage(QWidget):
         # Title
         title = QLabel("Welcome to Joels Annotation Toolkit")
         title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("font-size: 24px; font-weight: bold;")
+        title.setObjectName("WelcomeTitle")
 
         # Subtitle
         subtitle = QLabel("Choose a mode to get started:")
         subtitle.setAlignment(Qt.AlignCenter)
-        subtitle.setStyleSheet("font-size: 16px; color: gray;")
+        subtitle.setObjectName("WelcomeSubTitle")
 
         # Buttons
         video_btn = QPushButton("🎥  Video to Frame")
@@ -21,18 +21,7 @@ class WelcomePage(QWidget):
 
         for btn in (video_btn, annot_btn):
             btn.setFixedHeight(50)
-            btn.setStyleSheet("""
-             QPushButton {
-                font-size: 16px;
-                border-radius: 10px;
-                padding: 10px;
-                border: 2px solid #ccc;
-                }
-            QPushButton:hover {
-                background-color: #e6f0ff; /* light blue */
-                border: 2px solid #3399ff;
-                }
-            """)
+            btn.setObjectName("ToolButton")
 
         video_btn.clicked.connect(switch_to_video_callback)
         annot_btn.clicked.connect(switch_to_annotation_callback)
@@ -51,4 +40,5 @@ class WelcomePage(QWidget):
         layout.addStretch()
         layout.addLayout(btn_layout)
         layout.addStretch()
+
         self.setLayout(layout)

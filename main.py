@@ -1,9 +1,8 @@
 import sys
-from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QPushButton, QVBoxLayout, QFileDialog,
-                             QMainWindow, QGridLayout,QHBoxLayout, QStackedWidget)
-from video_view import VideoPlayerView
-from annotation_view import AnnotationToolView
-from welcome_view import WelcomePage
+from PyQt5.QtWidgets import (QApplication, QMainWindow, QStackedWidget)
+from views.video_view import VideoPlayerView
+from views.annotation_view import AnnotationToolView
+from views.welcome_view import WelcomePage
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -35,6 +34,11 @@ class MainWindow(QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
+
+    # Load stylesheet
+    with open("common/style.qss", "r") as f:
+        app.setStyleSheet(f.read())
+
     window = MainWindow()
     window.show()
     sys.exit(app.exec_())
