@@ -1,11 +1,11 @@
 from PyQt5.QtWidgets import (
     QWidget, QLabel, QPushButton, QVBoxLayout, QHBoxLayout, QListWidget,
-    QFileDialog, QComboBox, QLineEdit, QMessageBox, QDialog, QDialogButtonBox, QGraphicsView
+    QFileDialog, QComboBox, QLineEdit, QMessageBox, QDialog, QDialogButtonBox
 )
-from PyQt5.QtGui import QImage, QPixmap, QPainter, QPen, QColor, QFont
+from PyQt5.QtGui import QImage, QPixmap, QPainter, QPen, QFont
 from PyQt5.QtCore import Qt, QRect, QPoint, pyqtSignal
 
-from utils import *
+from common.utils import *
 
 class ClassSelectDialog(QDialog):
     def __init__(self, class_list):
@@ -101,7 +101,8 @@ class AnnotationToolView(QWidget):
         # Image display
         self.image_label = QLabel("Image")
         self.image_label.setAlignment(Qt.AlignCenter)
-        self.image_label.setObjectName("ImageLabel")
+        self.image_label.setStyleSheet("border: 1px solid gray; background: white;")
+
         self.image_label.mousePressEvent = self.start_drawing
         self.image_label.mouseMoveEvent = self.drawing
         self.image_label.mouseReleaseEvent = self.end_drawing

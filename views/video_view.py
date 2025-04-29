@@ -18,7 +18,9 @@ class VideoPlayerView(QWidget):
         # --- VIDEO DISPLAY ---
         self.video_label = QLabel("Video")
         self.video_label.setAlignment(Qt.AlignCenter)
-        self.video_label.setObjectName("VideoLabel")
+        self.video_label.setStyleSheet("border: 1px solid gray; background: white;")
+
+
 
         video_area = QVBoxLayout()
         video_area.addWidget(self.video_label)
