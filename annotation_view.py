@@ -4,8 +4,11 @@ from PyQt5.QtWidgets import (
     QWidget, QLabel, QPushButton, QVBoxLayout, QHBoxLayout, QListWidget,
     QFileDialog, QComboBox, QLineEdit, QMessageBox, QDialog, QDialogButtonBox, QGraphicsView
 )
-from PyQt5.QtGui import QImage, QPixmap, QPainter, QPen, QColor
+from PyQt5.QtGui import QImage, QPixmap, QPainter, QPen, QColor, QFont
 from PyQt5.QtCore import Qt, QRect, QPoint, pyqtSignal
+
+from style import *
+from utils import *
 
 class ClassSelectDialog(QDialog):
     def __init__(self, class_list):
@@ -35,42 +38,21 @@ class AnnotationToolView(QWidget):
         self.setWindowTitle("Annotation Tool")
         self.resize(1200, 800)
 
-        self.setStyleSheet("""
-            QLabel { font-size: 14px; }
-            QComboBox, QLineEdit, QListWidget { font-size: 14px; }
-        """)
-
-        button_style = """
-            QPushButton {
-                font-size: 14px;
-                padding: 8px 14px;
-                border-radius: 8px;
-                border: 2px solid #ccc;
-                background-color: white;
-            }
-            QPushButton:hover {
-                background-color: #e6f0ff;
-                border: 2px solid #3399ff;
-            }
-            QPushButton:pressed {
-                background-color: #cce0ff;
-                border: 2px solid #3399ff;
-            }
-        """
 
         # Back button
         self.back_btn = QPushButton("⬅ Back")
-        self.back_btn.setStyleSheet(button_style)
         self.back_btn.clicked.connect(self.emit_back_signal)
+
         topbar_wrapper = QHBoxLayout()
         topbar_wrapper.addWidget(self.back_btn)
         topbar_wrapper.setAlignment(Qt.AlignLeft)
 
         # Format dropdown
-        format_layout = QHBoxLayout()
         format_label = QLabel("Format: ")
         self.format_selector = QComboBox()
-        self.format_selector.addItems(["YOLO"])
+        self.format_selector.addItems(["YOLO", "COCO", "VOC"])
+
+        format_layout = QHBoxLayout()
         format_layout.addWidget(format_label, stretch=1)
         format_layout.addWidget(self.format_selector, stretch=2)
         format_layout.addStretch(stretch=3)
@@ -80,17 +62,14 @@ class AnnotationToolView(QWidget):
         self.add_class_input = QLineEdit()
         self.add_class_input.setPlaceholderText("Add new class here...")
         self.add_class_button = QPushButton("Add")
-        self.add_class_button.setStyleSheet(button_style)
         self.class_list = QListWidget()
-        self.class_list.setStyleSheet("color: gray; font-style: italic; background: white;")
+        self.class_list.setObjectName("ClassList")
         self.class_list.addItem("No classes added yet...")
         self.class_list.setEnabled(False)
 
         self.image_source_btn = QPushButton("🖼️ Add image source")
-        self.image_source_btn.setStyleSheet(button_style)
         self.image_source_label = QLabel("No source selected")
         self.output_folder_btn = QPushButton("📁 Add output source")
-        self.output_folder_btn.setStyleSheet(button_style)
         self.output_folder_label = QLabel("No folder selected")
 
         self.image_source_btn.clicked.connect(self.select_image_folder)
@@ -125,7 +104,7 @@ class AnnotationToolView(QWidget):
         # Image display
         self.image_label = QLabel("Image")
         self.image_label.setAlignment(Qt.AlignCenter)
-        self.image_label.setStyleSheet("border: 1px solid gray; background: white;")
+        self.image_label.setObjectName("ImageLabel")
         self.image_label.mousePressEvent = self.start_drawing
         self.image_label.mouseMoveEvent = self.drawing
         self.image_label.mouseReleaseEvent = self.end_drawing
@@ -135,13 +114,10 @@ class AnnotationToolView(QWidget):
 
         # Bottom controls
         self.prev_btn = QPushButton("◀")
-        self.prev_btn.setStyleSheet(button_style)
         self.next_btn = QPushButton("▶")
-        self.next_btn.setStyleSheet(button_style)
         self.image_index_label = QLabel("Image: x")
         self.annotation_count_label = QLabel("Nr annotations in image: 0")
         self.save_button = QPushButton("💾 Save")
-        self.save_button.setStyleSheet(button_style)
 
         self.prev_btn.clicked.connect(self.prev_image)
         self.next_btn.clicked.connect(self.next_image)
@@ -247,6 +223,7 @@ class AnnotationToolView(QWidget):
             self.load_image()
 
     def next_image(self):
+        self.annotations = []
         if self.current_index < len(self.image_paths) - 1:
             self.current_index += 1
             self.load_image()
@@ -305,9 +282,17 @@ class AnnotationToolView(QWidget):
                 class_id = dialog.selected_class_index()
                 rect = QRect(self.drawing_start, end_point).normalized()
 
-                self.annotation_rects.append((rect, class_id))
+                img_w = self.current_pixmap.width()
+                img_h = self.current_pixmap.height()
 
-                # Convert to YOLO format using original image size
+
+                self.annotations.append({
+                    "class_id": class_id,
+                    "bbox": (rect.left(), rect.top(), rect.right(), rect.bottom()),  # always in pixel coordinates
+                    "image_size": (img_w, img_h)  # optional, if needed
+                })
+
+                """# Convert to YOLO format using original image size
                 img_w = self.current_pixmap.width()
                 img_h = self.current_pixmap.height()
 
@@ -315,11 +300,11 @@ class AnnotationToolView(QWidget):
                 y_center = (rect.top() + rect.height() / 2) / img_h
                 w = rect.width() / img_w
                 h = rect.height() / img_h
+                self.annotations.append((class_id, x_center, y_center, w, h))"""
 
-                self.annotations.append((class_id, x_center, y_center, w, h))
                 self.annotation_count_label.setText(f"Nr annotations: {len(self.annotations)}")
 
-                self.redraw_image_with_boxes()
+            self.redraw_image_with_boxes()
         self.drawing_start = None
 
     def save_annotations(self):
@@ -327,25 +312,17 @@ class AnnotationToolView(QWidget):
             QMessageBox.warning(self, "Missing paths", "Please select image source and output folder.")
             return
 
-        image_filename = f"{self.current_index + 1}.jpg"
-        label_filename = f"{self.current_index + 1}.txt"
-
-        os.makedirs(os.path.join(self.output_folder, "images"), exist_ok=True)
-        os.makedirs(os.path.join(self.output_folder, "labels"), exist_ok=True)
-
-        image_path = os.path.join(self.output_folder,"images", image_filename)
-        label_path = os.path.join(self.output_folder, "labels", label_filename)
-
+        # Get format choice from the dropdown
+        format_choice = self.format_selector.currentText()
         # Save image
         orig_img = cv2.imread(self.image_paths[self.current_index])
-        cv2.imwrite(image_path, orig_img)
+        if format_choice == "YOLO":
+            save_as_yolo_format(self.current_index, self.annotations, self.output_folder, orig_img)
+        elif format_choice ==  "COCO":
+            save_as_coco_format(self.current_index, self.annotations, self.output_folder, orig_img, self.classes)
+        elif format_choice == "VOC":
+            save_as_voc_format(self.current_index, self.annotations, self.output_folder, orig_img, self.classes)
 
-        # Save annotations
-        with open(label_path, 'w') as f:
-            for ann in self.annotations:
-                f.write(f"{ann[0]} {ann[1]:.6f} {ann[2]:.6f} {ann[3]:.6f} {ann[4]:.6f}\n")
-
-        #QMessageBox.information(self, "Saved", f"Saved to {label_path}")
         self.next_image()
 
     def resizeEvent(self, event):
@@ -372,11 +349,23 @@ class AnnotationToolView(QWidget):
         temp_pixmap = self.current_pixmap.copy()
         painter = QPainter(temp_pixmap)
 
-        for rect, class_id in self.annotation_rects:
-            color = self.get_class_color(class_id)
+        for ann in self.annotations:
+            class_id = ann["class_id"]
+            x_min, y_min, x_max, y_max = ann["bbox"]
+
+            color = get_class_color(class_id)
             pen = QPen(color, 2, Qt.SolidLine)
             painter.setPen(pen)
+
+            # Draw rectangle
+            rect = QRect(x_min, y_min, x_max - x_min, y_max - y_min)
             painter.drawRect(rect)
+
+            # Draw class name above the rectangle
+            painter.setFont(QFont('Arial', 12))  # you can adjust font and size
+            class_name = self.classes[class_id] if class_id < len(self.classes) else str(class_id)
+            text_rect = QRect(x_min, max(0, y_min - 20), 150, 20)  # (x, y-20) puts text above box
+            painter.drawText(text_rect, Qt.AlignLeft, class_name)
 
         painter.end()
 
@@ -407,10 +396,3 @@ class AnnotationToolView(QWidget):
 
         return x_offset, y_offset, x_scale, y_scale
 
-
-    def get_class_color(self, class_id):
-        # Generates a distinct QColor using HSV hue rotation
-        hue = (class_id * 137) % 360  # 137 is a good spacing constant
-        color = QColor()
-        color.setHsl(hue, 255, 180)  # Full saturation, medium lightness
-        return color
