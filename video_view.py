@@ -40,7 +40,7 @@ class VideoPlayerView(QWidget):
         # --- VIDEO DISPLAY ---
         self.video_label = QLabel("Video")
         self.video_label.setAlignment(Qt.AlignCenter)
-        self.video_label.setStyleSheet("border: 1px solid gray; background: white;")
+        self.video_label.setObjectName("VideoLabel")
 
         video_area = QVBoxLayout()
         video_area.addWidget(self.video_label)
@@ -157,8 +157,6 @@ class VideoPlayerView(QWidget):
         if folder:
             self.output_folder = folder
             self.output_folder_label.setText(folder)
-
-    # === Frame Controls ===
 
     def toggle_play(self):
         if self.timer.isActive():
