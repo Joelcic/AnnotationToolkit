@@ -1,5 +1,3 @@
-import os
-import cv2
 from PyQt5.QtWidgets import (
     QWidget, QLabel, QPushButton, QVBoxLayout, QHBoxLayout, QListWidget,
     QFileDialog, QComboBox, QLineEdit, QMessageBox, QDialog, QDialogButtonBox, QGraphicsView
@@ -7,7 +5,6 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtGui import QImage, QPixmap, QPainter, QPen, QColor, QFont
 from PyQt5.QtCore import Qt, QRect, QPoint, pyqtSignal
 
-from style import *
 from utils import *
 
 class ClassSelectDialog(QDialog):

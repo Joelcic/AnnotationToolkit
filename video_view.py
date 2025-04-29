@@ -15,28 +15,6 @@ class VideoPlayerView(QWidget):
         self.setWindowTitle("Video → Frame")
         self.setGeometry(100, 100, 1000, 700)
 
-        # --- 🌟 GLOBAL STYLES ---
-        self.setStyleSheet("""
-            QLabel {
-                font-size: 14px;
-            }
-            QPushButton {
-                font-size: 14px;
-                padding: 8px 14px;
-                border-radius: 8px;
-                border: 2px solid #ccc;
-                background-color: white;
-            }
-            QPushButton:hover {
-                background-color: #e6f0ff;
-                border: 2px solid #3399ff;
-            }
-            QPushButton:pressed {
-                background-color: #cce0ff;
-                border: 2px solid #3399ff;
-            }
-        """)
-
         # --- VIDEO DISPLAY ---
         self.video_label = QLabel("Video")
         self.video_label.setAlignment(Qt.AlignCenter)
@@ -138,8 +116,6 @@ class VideoPlayerView(QWidget):
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.next_frame_auto)
-
-    # === Navigation / File ===
 
     def emit_back_signal(self):
         self.back_to_menu.emit()

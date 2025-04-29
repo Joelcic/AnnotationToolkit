@@ -1,6 +1,5 @@
 from PyQt5.QtWidgets import QWidget, QLabel, QPushButton, QVBoxLayout
 from PyQt5.QtCore import Qt
-from style import *
 
 class WelcomePage(QWidget):
     def __init__(self, switch_to_video_callback, switch_to_annotation_callback):
