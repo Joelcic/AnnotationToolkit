@@ -156,7 +156,6 @@ class AnnotationToolView(QWidget):
         self.current_index = 0
         self.drawing_start = None
         self.current_pixmap = None
-        self.annotation_rects = []
 
     def emit_back_signal(self):
         self.back_to_menu.emit()
@@ -210,7 +209,6 @@ class AnnotationToolView(QWidget):
             Qt.KeepAspectRatio,
             Qt.SmoothTransformation
         )
-        self.annotation_rects = []
         self.annotations = []
         self.image_index_label.setText(f"Image: {self.current_index + 1}/{len(self.image_paths)}")
         self.annotation_count_label.setText(f"Nr annotations: {len(self.annotations)}")
@@ -253,9 +251,11 @@ class AnnotationToolView(QWidget):
             temp_pixmap = self.current_pixmap.copy()
             painter = QPainter(temp_pixmap)
             painter.setPen(QPen(Qt.red, 2, Qt.SolidLine))
-
-            for rect, _ in self.annotation_rects:
+            for ann in self.annotations:
+                x_min, y_min, x_max, y_max = ann["bbox"]
+                rect = QRect(x_min, y_min, x_max - x_min, y_max - y_min)
                 painter.drawRect(rect)
+
 
             painter.drawRect(QRect(self.drawing_start, temp_point).normalized())
             painter.end()
@@ -291,16 +291,6 @@ class AnnotationToolView(QWidget):
                     "bbox": (rect.left(), rect.top(), rect.right(), rect.bottom()),  # always in pixel coordinates
                     "image_size": (img_w, img_h)  # optional, if needed
                 })
-
-                """# Convert to YOLO format using original image size
-                img_w = self.current_pixmap.width()
-                img_h = self.current_pixmap.height()
-
-                x_center = (rect.left() + rect.width() / 2) / img_w
-                y_center = (rect.top() + rect.height() / 2) / img_h
-                w = rect.width() / img_w
-                h = rect.height() / img_h
-                self.annotations.append((class_id, x_center, y_center, w, h))"""
 
                 self.annotation_count_label.setText(f"Nr annotations: {len(self.annotations)}")
 
