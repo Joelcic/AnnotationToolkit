@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtGui import QImage, QPixmap, QPainter, QPen, QFont
 from PyQt5.QtCore import Qt, QRect, QPoint, pyqtSignal
 
-from common.utils import *
+from common.utils_annotation import *
 
 class ClassSelectDialog(QDialog):
     def __init__(self, class_list):
